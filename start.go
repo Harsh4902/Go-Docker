@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
+	"github.com/docker/go-connections/nat"
 )
 
 func StartDocker(imageName string) {
@@ -19,6 +20,17 @@ func StartDocker(imageName string) {
 	}
 	defer cli.Close()
 
+	// Define exposed port and bindings
+	exposedPort, _ := nat.NewPort("tcp", "80")
+	portBindings := nat.PortMap{
+		exposedPort: []nat.PortBinding{
+			{
+				HostIP:   "0.0.0.0",
+				HostPort: "8080",
+			},
+		},
+	}
+
 	out, err := cli.ImagePull(ctx, imageName, image.PullOptions{})
 	if err != nil {
 		panic(err)
@@ -26,9 +38,16 @@ func StartDocker(imageName string) {
 	defer out.Close()
 	io.Copy(os.Stdout, out)
 
-	resp, err := cli.ContainerCreate(ctx, &container.Config{
-		Image: imageName,
-	}, nil, nil, nil, "")
+	resp, err := cli.ContainerCreate(
+		ctx,
+		&container.Config{
+			Image:        imageName,
+			ExposedPorts: nat.PortSet{exposedPort: struct{}{}},
+		},
+		&container.HostConfig{
+			PortBindings: portBindings,
+		}, nil, nil, "")
+
 	if err != nil {
 		panic(err)
 	}
