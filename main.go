@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -9,6 +10,15 @@ func main() {
 
 	if cmd == "start" {
 		imageName := os.Args[2]
+		driver := os.Args[3]
+		cfg, err := LoadConfig(ConfigPath)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		cfg.Instance.Driver = driver
+		SaveConfig(ConfigPath, cfg)
 		StartDocker(imageName)
 	}
 

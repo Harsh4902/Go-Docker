@@ -5,13 +5,17 @@ import (
 	"fmt"
 
 	containertypes "github.com/docker/docker/api/types/container"
-
-	"github.com/docker/docker/client"
 )
 
 func StopDocker(containerId string) {
 	ctx := context.Background()
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	cfg, err := LoadConfig(ConfigPath)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	cli, err := GetClient(cfg.Instance.Driver)
 	if err != nil {
 		panic(err)
 	}

@@ -8,6 +8,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var ConfigPath = filepath.Join(os.Getenv("HOME"), ".microcks-cli", "config.yaml")
+
 type Config struct {
 	Instance struct {
 		Name        string `yaml:"name"`
@@ -16,6 +18,7 @@ type Config struct {
 		Port        string `yaml:"port"`
 		ContainerID string `yaml:"containerID"`
 		AutoRemove  bool   `yaml:"autoRemove"`
+		Driver      string `yaml:"driver"`
 	} `yaml:"instance"`
 }
 
@@ -29,12 +32,14 @@ func defaultConfig() *Config {
 			Port        string `yaml:"port"`
 			ContainerID string `yaml:"containerID"`
 			AutoRemove  bool   `yaml:"autoRemove"`
+			Driver      string `yaml:"driver"`
 		}{
 			Name:       "microcks",
 			Image:      "",
 			Status:     "",
 			Port:       "",
 			AutoRemove: false,
+			Driver:     "",
 		},
 	}
 }
