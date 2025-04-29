@@ -26,6 +26,15 @@ func StartDocker(imageName string) {
 	}
 	defer cli.Close()
 
+	if cfg.Instance.Status == "Running" {
+		fmt.Println("Microcks instance is already running...")
+		return
+	} else if cfg.Instance.Status == "Stopped" {
+		if err := cli.ContainerStart(ctx, cfg.Instance.ContainerID, container.StartOptions{}); err != nil {
+			panic(err)
+		}
+	}
+
 	// Define exposed port and bindings
 	exposedPort, _ := nat.NewPort("tcp", "80")
 	portBindings := nat.PortMap{
